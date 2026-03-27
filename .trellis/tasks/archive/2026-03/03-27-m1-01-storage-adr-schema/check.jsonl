@@ -1,0 +1,12 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-backend/SKILL.md", "reason": "Backend check spec"}
+{"file": ".trellis/spec/backend/database.md", "reason": "Verify persistence design follows repository file IO standards"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Verify failure handling and exit boundaries are correct"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Verify user-facing diagnostics are stream-safe and concise"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Validate delivery against backend quality checklist"}
+{"file": ".trellis/spec/guides/semantic-change-checklist.md", "reason": "Validate schema and meaning changes are fully propagated"}
+{"file": "docs/architecture/pr1-foundation.md", "reason": "Validate ADR/schema decisions stay consistent with architecture baseline"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Validate integration impact for desktop storage state"}
+{"file": "packages/core/src/store.ts", "reason": "Validate store contract compatibility"}
+{"file": "packages/core/src/event-log.ts", "reason": "Validate idempotent merge and validation semantics are unchanged"}
+{"file": "packages/core/src/annotation.ts", "reason": "Validate LWW annotation semantics remain intact"}

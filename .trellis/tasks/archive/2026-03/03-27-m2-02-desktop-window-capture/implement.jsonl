@@ -1,0 +1,11 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/spec/frontend/hooks.md", "reason": "Hook effect integration for capture pipeline"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Capture state ownership and boundary"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Strict contracts for capture events"}
+{"file": "docs/architecture/pr2-capture-ui.md", "reason": "Capture scope baseline"}
+{"file": "docs/architecture/m2-capture-provider-abstraction.md", "reason": "Provider contract from M2-01"}
+{"file": "apps/desktop/src/capture/provider.ts", "reason": "Current provider implementation to extend"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Capture timer integration point"}
+{"file": "apps/desktop/test/capture-provider.test.ts", "reason": "Provider behavior tests baseline"}

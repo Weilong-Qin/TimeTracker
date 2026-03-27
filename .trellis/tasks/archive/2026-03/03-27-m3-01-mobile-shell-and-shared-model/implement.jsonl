@@ -1,0 +1,9 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Define mobile shell state ownership with shared model"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Shared contract typing for mobile shell model"}
+{"file": "packages/core/src/store.ts", "reason": "Shared ActivityStore contract and summary behavior"}
+{"file": "packages/core/src/manual.ts", "reason": "Manual entry creation contract"}
+{"file": "packages/core/src/inbox.ts", "reason": "Pending inbox contract reuse"}
+{"file": "apps/mobile/src/main.ts", "reason": "Current mobile bootstrap entry"}

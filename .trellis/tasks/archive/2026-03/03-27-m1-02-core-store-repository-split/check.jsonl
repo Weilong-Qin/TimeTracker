@@ -1,0 +1,10 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-backend/SKILL.md", "reason": "Backend check spec"}
+{"file": ".trellis/spec/backend/database.md", "reason": "Verify abstraction still aligns with persistence rules"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Verify failure behavior consistency"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Type safety and code quality verification"}
+{"file": "docs/architecture/m1-local-persistence-adr-schema.md", "reason": "Verify implementation matches ADR"}
+{"file": "packages/core/src/store.ts", "reason": "Verify behavioral compatibility"}
+{"file": "packages/core/src/annotation.ts", "reason": "Verify LWW unchanged"}
+{"file": "packages/core/src/event-log.ts", "reason": "Verify merge semantics unchanged"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Verify integration compatibility"}

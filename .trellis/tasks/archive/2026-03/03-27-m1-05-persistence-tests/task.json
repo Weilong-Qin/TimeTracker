@@ -1,0 +1,44 @@
+{
+  "id": "m1-05-persistence-tests",
+  "name": "m1-05-persistence-tests",
+  "title": "M1-05: Persistence test coverage",
+  "description": "Add unit/integration tests for append/merge/LWW/reload persistence scenarios.",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "priority": "P0",
+  "creator": "weilong",
+  "assignee": "weilong",
+  "createdAt": "2026-03-27",
+  "completedAt": "2026-03-27",
+  "branch": null,
+  "base_branch": "master",
+  "worktree_path": null,
+  "current_phase": 0,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check"
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

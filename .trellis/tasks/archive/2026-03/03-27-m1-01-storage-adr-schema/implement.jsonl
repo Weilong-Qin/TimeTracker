@@ -1,0 +1,13 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/backend/database.md", "reason": "File-based persistence rules and atomic write expectations"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Error category and boundary ownership for persistence failures"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Logging and stderr/stdout policy for actionable diagnostics"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Backend quality checklist before implementation delivery"}
+{"file": ".trellis/spec/guides/pre-implementation-checklist.md", "reason": "Pre-change checklist for schema/contract modifications"}
+{"file": ".trellis/spec/guides/semantic-change-checklist.md", "reason": "Guardrails when changing data meaning/version semantics"}
+{"file": "docs/architecture/pr1-foundation.md", "reason": "Current architecture baseline and explicit persistence limitation"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Current desktop state/persistence touchpoints via localStorage and in-memory store"}
+{"file": "packages/core/src/store.ts", "reason": "Current in-memory store behavior and expected interfaces"}
+{"file": "packages/core/src/event-log.ts", "reason": "Event validation/merge semantics to preserve with persistent model"}
+{"file": "packages/core/src/annotation.ts", "reason": "LWW annotation merge semantics for persistence contract"}

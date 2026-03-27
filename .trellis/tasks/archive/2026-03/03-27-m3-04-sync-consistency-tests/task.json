@@ -1,10 +1,10 @@
 {
-  "id": "m3-07-beta-hardening",
-  "name": "m3-07-beta-hardening",
-  "title": "M3-07: Beta hardening",
-  "description": "Run final regression and clear P0 blockers before beta release.",
+  "id": "m3-04-sync-consistency-tests",
+  "name": "m3-04-sync-consistency-tests",
+  "title": "M3-04: Sync consistency tests",
+  "description": "Add idempotency and LWW cross-device consistency tests.",
   "status": "completed",
-  "dev_type": "fullstack",
+  "dev_type": null,
   "scope": null,
   "priority": "P0",
   "creator": "weilong",
@@ -38,11 +38,7 @@
   "subtasks": [],
   "children": [],
   "parent": null,
-  "relatedFiles": [
-    "scripts/beta-hardening.sh",
-    "package.json",
-    "docs/architecture/m3-beta-hardening-summary.md"
-  ],
-  "notes": "Final beta hardening gate rerun passed on 2026-03-27: core/reporting/sync/mobile/desktop tests plus workspace typecheck/lint/test.",
+  "relatedFiles": [],
+  "notes": "",
   "meta": {}
 }

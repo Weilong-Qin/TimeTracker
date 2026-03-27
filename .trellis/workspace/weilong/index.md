@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 2
+- **Total Sessions**: 5
 - **Last Active**: 2026-03-27
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~98 | Active |
+| `journal-1.md` | ~230 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,9 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits |
 |---|------|-------|---------|
+| 5 | 2026-03-27 | M4 reliability, append optimization, and sync encryption | `8070c5c` |
+| 4 | 2026-03-27 | M3-07 beta hardening closeout | `18f3e69` |
+| 3 | 2026-03-27 | M2-05 timeline/inbox UX fast classification | `be86ca7` |
 | 2 | 2026-03-27 | Bootstrap TimeTracker MVP PR1-PR4 | `f36e251` |
 | 1 | 2026-03-27 | Bootstrap guidelines completion | - |
 <!-- @@@/auto:session-history -->

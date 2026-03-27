@@ -1,0 +1,9 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-backend/SKILL.md", "reason": "Backend check spec"}
+{"file": ".agents/skills/check-frontend/SKILL.md", "reason": "Frontend check spec"}
+{"file": ".trellis/spec/frontend/hooks.md", "reason": "Verify stable dependencies and no hidden state coupling"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify capture state remains single-source"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify strict event typing"}
+{"file": "apps/desktop/src/capture/provider.ts", "reason": "Verify window capture fallback and diagnostics"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Verify timeline integration still works"}
+{"file": "apps/desktop/test/capture-provider.test.ts", "reason": "Verify new window capture tests"}

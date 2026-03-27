@@ -1,0 +1,11 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/backend/database.md", "reason": "Persistence boundary expectations for repository abstraction"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Error handling boundaries for storage layer"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Backend quality and typing checklist"}
+{"file": ".trellis/spec/guides/pre-implementation-checklist.md", "reason": "Pre-change checklist for introducing new interfaces"}
+{"file": "docs/architecture/m1-local-persistence-adr-schema.md", "reason": "ADR schema contract that repository split must support"}
+{"file": "packages/core/src/store.ts", "reason": "Current store behavior to preserve"}
+{"file": "packages/core/src/annotation.ts", "reason": "LWW semantics must remain unchanged"}
+{"file": "packages/core/src/event-log.ts", "reason": "Event validation and merge semantics must remain unchanged"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Current app integration contract to keep stable"}

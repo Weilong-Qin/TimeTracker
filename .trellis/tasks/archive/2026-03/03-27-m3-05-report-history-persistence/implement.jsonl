@@ -1,0 +1,7 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": "apps/desktop/src/lib/report-history.ts", "reason": "Report history persistence model and retrieval functions"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Integrate history retrieval with editor flow"}
+{"file": "apps/desktop/src/App.tsx", "reason": "Expose report history retrieval in UI"}
+{"file": "apps/desktop/test/report-history.test.ts", "reason": "Persistence/retrieval regression tests"}

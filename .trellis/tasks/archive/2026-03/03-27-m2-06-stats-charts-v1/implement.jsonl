@@ -1,0 +1,9 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/spec/frontend/components.md", "reason": "Component accessibility and composition rules"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "State ownership rules for UI-derived data"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Type strictness for chart view models"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Current summary and category snapshot source"}
+{"file": "apps/desktop/src/App.tsx", "reason": "Desktop stats/inbox/timeline UI composition"}
+{"file": "apps/desktop/src/styles.css", "reason": "Existing panel/grid visual system"}
+{"file": "packages/core/src/classification.ts", "reason": "Natural vs stacked summary semantics"}

@@ -1,0 +1,8 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Sync payload parse/merge failures must degrade safely"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Actionable sync diagnostics and compatibility behavior"}
+{"file": "packages/sync-r2/src/engine.ts", "reason": "Extend sync channel while preserving syncDay behavior"}
+{"file": "packages/sync-r2/src/types.ts", "reason": "Define key patterns for annotations/reports objects"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Apply merged annotations/reports to local state"}

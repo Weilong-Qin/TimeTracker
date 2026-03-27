@@ -1,0 +1,7 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Offline gate should classify failures and produce actionable blocker notes"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Executable gate and reproducible checks"}
+{"file": "apps/desktop/test/cold-start-recovery.test.ts", "reason": "Baseline desktop restart/recovery regression pattern"}
+{"file": "packages/reporting/src/ai.ts", "reason": "Report fallback behavior under offline/disabled AI"}
+{"file": "packages/reporting/src/push.ts", "reason": "No-target push should skip safely in offline mode"}

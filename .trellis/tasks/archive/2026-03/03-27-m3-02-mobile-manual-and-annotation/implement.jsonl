@@ -1,0 +1,6 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": "apps/mobile/src/model/mobile-shell.ts", "reason": "Manual entry and annotation editing flow"}
+{"file": "apps/mobile/test/mobile-shell.test.ts", "reason": "Flow verification and LWW semantics"}
+{"file": "packages/core/src/annotation.ts", "reason": "LWW merge semantics contract"}

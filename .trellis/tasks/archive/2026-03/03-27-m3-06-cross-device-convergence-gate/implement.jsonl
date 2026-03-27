@@ -1,0 +1,6 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Convergence gate should tolerate recoverable sync states"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Convergence diagnostics and residual variance notes"}
+{"file": "packages/sync-r2/test/sync-bundle.test.ts", "reason": "Base sync matrix to extend with convergence gate"}
+{"file": "packages/sync-r2/src/engine.ts", "reason": "Reference sync behavior for convergence assertions"}

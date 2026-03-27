@@ -1,0 +1,9 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/backend/database.md", "reason": "Persistence and file-IO discipline for migration/recovery path"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Recoverable failure behavior and non-crash guarantees"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Actionable diagnostics strategy"}
+{"file": ".trellis/spec/guides/semantic-change-checklist.md", "reason": "Schema/version semantic change checklist"}
+{"file": "docs/architecture/m1-local-persistence-adr-schema.md", "reason": "Authoritative migration and recovery contract"}
+{"file": "apps/desktop/src/storage/persistence.ts", "reason": "Current desktop persistence adapter implementation"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Integration lifecycle where migration bootstraps"}

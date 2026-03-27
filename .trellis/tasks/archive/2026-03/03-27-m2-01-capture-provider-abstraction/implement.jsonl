@@ -1,0 +1,9 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/spec/frontend/hooks.md", "reason": "Hook dependency and abstraction boundary guidance"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "State ownership boundaries for capture pipeline integration"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Type safety rules for provider interfaces and runtime selection"}
+{"file": "apps/desktop/src/capture/mock-capture.ts", "reason": "Current mock capture generator baseline"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Current capture timer integration point"}
+{"file": "docs/architecture/pr2-capture-ui.md", "reason": "Capture pipeline scope baseline"}

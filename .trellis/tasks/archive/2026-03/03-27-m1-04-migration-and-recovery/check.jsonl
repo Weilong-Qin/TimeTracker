@@ -1,0 +1,9 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-backend/SKILL.md", "reason": "Backend check spec"}
+{"file": ".trellis/spec/backend/database.md", "reason": "Verify migration path respects persistence rules"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Verify fail-open recovery without crashes"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Verify diagnostics are concise and actionable"}
+{"file": ".trellis/spec/guides/semantic-change-checklist.md", "reason": "Verify version semantics are consistently updated"}
+{"file": "docs/architecture/m1-local-persistence-adr-schema.md", "reason": "Verify runtime behavior matches ADR"}
+{"file": "apps/desktop/src/storage/persistence.ts", "reason": "Verify migration/recovery implementation"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "Verify boot integration remains stable"}
