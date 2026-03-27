@@ -1,0 +1,6 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Hardening gate should fail fast with actionable output"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Consistency and blocker summary output standards"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Regression checklist as reproducible commands"}
+{"file": "package.json", "reason": "Expose hardening command for CI/manual runs"}

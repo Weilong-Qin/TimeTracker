@@ -5,6 +5,7 @@
   "description": "Cross-device time tracking and AI recap app",
   "packageManager": "pnpm@10.0.0",
   "scripts": {
+    "beta:hardening": "bash ./scripts/beta-hardening.sh",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test"
