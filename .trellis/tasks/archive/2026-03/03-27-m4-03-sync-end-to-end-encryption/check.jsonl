@@ -1,0 +1,5 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-backend/SKILL.md", "reason": "Backend check spec"}
+{"file": ".agents/skills/check-frontend/SKILL.md", "reason": "Frontend check spec"}
+{"file": "docs/architecture/pr3-r2-sync-engine.md", "reason": "Ensure deferred item closure stays in scope"}
+{"file": "packages/sync-r2/test/sync-bundle.test.ts", "reason": "Encrypt/decrypt regression coverage"}

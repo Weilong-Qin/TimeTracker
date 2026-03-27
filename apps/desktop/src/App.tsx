@@ -1,4 +1,4 @@
-import type { ActivityEvent, Annotation, PendingInboxItem } from '@timetracker/core';
+import type { ActivityEvent, Annotation, CategorySummary, PendingInboxItem } from '@timetracker/core';
 import { useEffect, useMemo, useState } from 'react';
 import { formatClock, formatDuration } from './lib/format.js';
 import { useActivityModel } from './hooks/use-activity-model.js';
@@ -208,6 +208,92 @@ function InboxRow({ item, onApply }: InboxRowProps) {
   );
 }
 
+function toPercent(value: number, baseline: number): number {
+  if (baseline <= 0) {
+    return 0;
+  }
+
+  return Math.min(100, Math.max(0, (value / baseline) * 100));
+}
+
+interface DurationSemanticsChartProps {
+  naturalMs: number;
+  stackedMs: number;
+}
+
+function DurationSemanticsChart({ naturalMs, stackedMs }: DurationSemanticsChartProps) {
+  const baseline = Math.max(naturalMs, stackedMs, 1);
+  const naturalPercent = toPercent(naturalMs, baseline);
+  const stackedPercent = toPercent(stackedMs, baseline);
+  const overlapMultiplier = naturalMs > 0 ? (stackedMs / naturalMs).toFixed(2) : 'N/A';
+
+  return (
+    <div className="chart-stack">
+      <article className="chart-row">
+        <div className="chart-row-head">
+          <strong>自然时长</strong>
+          <span>{formatDuration(naturalMs)}</span>
+        </div>
+        <div className="chart-track">
+          <div className="chart-fill natural" style={{ width: `${naturalPercent}%` }} />
+        </div>
+        <small>同一时段仅记 1 份时间，用于衡量真实流逝时长。</small>
+      </article>
+      <article className="chart-row">
+        <div className="chart-row-head">
+          <strong>并行叠加时长</strong>
+          <span>{formatDuration(stackedMs)}</span>
+        </div>
+        <div className="chart-track">
+          <div className="chart-fill stacked" style={{ width: `${stackedPercent}%` }} />
+        </div>
+        <small>多任务并行会叠加统计，适合评估负载强度。</small>
+      </article>
+      <p className="chart-footnote">并行系数: {overlapMultiplier}x（叠加 / 自然）</p>
+    </div>
+  );
+}
+
+interface CategoryDistributionChartProps {
+  categories: CategorySummary[];
+}
+
+function CategoryDistributionChart({ categories }: CategoryDistributionChartProps) {
+  if (categories.length === 0) {
+    return <p className="empty">当前没有可视化分类数据。</p>;
+  }
+
+  const topCategories = categories.slice(0, 8);
+  const baseline = Math.max(...topCategories.map((item) => item.stackedMs), 1);
+
+  return (
+    <div className="chart-stack" role="list" aria-label="主分类分布图">
+      {topCategories.map((item) => {
+        const stackedPercent = toPercent(item.stackedMs, baseline);
+        const naturalPercent = toPercent(item.naturalMs, baseline);
+
+        return (
+          <article key={item.key} className="chart-row" role="listitem">
+            <div className="chart-row-head">
+              <strong>{item.key}</strong>
+              <span>
+                自然 {formatDuration(item.naturalMs)} · 叠加 {formatDuration(item.stackedMs)}
+              </span>
+            </div>
+            <div className="chart-track">
+              <div className="chart-fill stacked" style={{ width: `${stackedPercent}%` }} />
+            </div>
+            <div className="chart-track muted">
+              <div className="chart-fill natural" style={{ width: `${naturalPercent}%` }} />
+            </div>
+          </article>
+        );
+      })}
+      <p className="chart-footnote">上轨: 叠加时长 · 下轨: 自然时长（同一基线）</p>
+    </div>
+  );
+}
+
 export function App() {
   const {
     day,
@@ -216,7 +302,7 @@ export function App() {
     events,
     annotations,
     pendingInbox,
-    categorySnapshots,
+    categorySummaries,
     stackedMs,
     naturalMs,
     captureRunning,
@@ -234,6 +320,9 @@ export function App() {
     pushSettings,
     updatePushSettings,
     reportText,
+    activeReportId,
+    reportHistory,
+    openReportHistory,
     setReportText,
     generateReportNow,
     pushReportNow,
@@ -296,6 +385,12 @@ export function App() {
       </section>
 
       <section className="panel">
+        <h2>时长语义图</h2>
+        <p className="lead">图中明确区分自然时长与并行叠加时长，帮助快速识别并行工作密度。</p>
+        <DurationSemanticsChart naturalMs={naturalMs} stackedMs={stackedMs} />
+      </section>
+
+      <section className="panel">
         <h2>R2 同步设置（可选）</h2>
         <div className="sync-grid">
           <label>
@@ -349,6 +444,19 @@ export function App() {
               value={syncSettings.region}
               onChange={(inputEvent) => updateSyncSettings({ region: inputEvent.target.value.trim() || 'auto' })}
               placeholder="auto"
+            />
+          </label>
+          <label>
+            端到端加密口令（可选）
+            <input
+              type="password"
+              value={syncSettings.encryptionPassphrase}
+              onChange={(inputEvent) =>
+                updateSyncSettings({
+                  encryptionPassphrase: inputEvent.target.value,
+                })
+              }
+              placeholder="同步对象加密口令"
             />
           </label>
           <label>
@@ -494,6 +602,24 @@ export function App() {
             {reportStatus.pushing ? '推送中...' : '推送报告'}
           </button>
         </div>
+        <div className="report-history-panel">
+          <h3>报告历史（最近 24 条）</h3>
+          <ul className="report-history-list">
+            {reportHistory.map((item) => (
+              <li key={item.reportId}>
+                <button
+                  type="button"
+                  className={item.reportId === activeReportId ? 'chip primary' : 'chip'}
+                  onClick={() => openReportHistory(item.reportId)}
+                >
+                  {item.periodType}:{item.periodKey} · {item.source}
+                </button>
+                <span>{item.preview}</span>
+              </li>
+            ))}
+            {reportHistory.length === 0 && <li className="empty">暂无历史报告。</li>}
+          </ul>
+        </div>
         <p className="sync-status">
           状态: {reportStatus.message}
           {reportStatus.lastGeneratedAt ? ` · 最近生成 ${formatClock(reportStatus.lastGeneratedAt)}` : ''}
@@ -525,15 +651,8 @@ export function App() {
 
       <section className="panel">
         <h2>分类汇总（主分类）</h2>
-        <ul className="category-list">
-          {categorySnapshots.map((item) => (
-            <li key={item.name}>
-              <span>{item.name}</span>
-              <strong>{formatDuration(item.durationMs)}</strong>
-            </li>
-          ))}
-          {categorySnapshots.length === 0 && <li>暂无数据</li>}
-        </ul>
+        <p className="lead">分类图基于同一份 day summary 计算，确保与顶部统计卡口径一致。</p>
+        <CategoryDistributionChart categories={categorySummaries} />
       </section>
 
       <section className="panel">

@@ -1,0 +1,5 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": "packages/sync-r2/src/engine.ts", "reason": "Current sync push/pull path"}
+{"file": "docs/architecture/pr3-r2-sync-engine.md", "reason": "Deferred item source and sync design baseline"}

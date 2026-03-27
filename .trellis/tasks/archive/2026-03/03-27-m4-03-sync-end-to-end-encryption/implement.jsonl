@@ -1,0 +1,5 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": "docs/architecture/pr3-r2-sync-engine.md", "reason": "Encryption deferred item source"}
+{"file": "packages/sync-r2/src/engine.ts", "reason": "Sync payload read/write path"}

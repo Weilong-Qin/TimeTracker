@@ -1,0 +1,44 @@
+{
+  "id": "m4-03-sync-end-to-end-encryption",
+  "name": "m4-03-sync-end-to-end-encryption",
+  "title": "M4-03: Sync end-to-end payload encryption",
+  "description": "Add optional end-to-end encryption for sync payloads across events, annotations, and reports.",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "priority": "P1",
+  "creator": "weilong",
+  "assignee": "weilong",
+  "createdAt": "2026-03-27",
+  "completedAt": "2026-03-27",
+  "branch": null,
+  "base_branch": "master",
+  "worktree_path": null,
+  "current_phase": 0,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check"
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}
