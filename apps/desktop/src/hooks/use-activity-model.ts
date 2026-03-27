@@ -41,6 +41,16 @@ import {
   upsertReportArtifact,
 } from '../lib/report-history.js';
 import {
+  appendSyncTelemetry,
+  parseSyncTelemetry,
+  stringifySyncTelemetry,
+  summarizeSyncTelemetry,
+  tuneRetryPolicyFromTelemetry,
+  tuneSyncIntervalFromTelemetry,
+  type SyncTelemetryEntry,
+  type RetryPolicySnapshot,
+} from '../lib/sync-telemetry.js';
+import {
   DESKTOP_STORAGE_KEYS,
   LocalStorageActivityEventRepository,
   LocalStorageAnnotationRepository,
@@ -126,19 +136,19 @@ const DEFAULT_PUSH_SETTINGS: PushProviderSettings = {
   feishuWebhookUrl: '',
 };
 
-const DEFAULT_SYNC_RETRY_POLICY = {
+const BASE_SYNC_RETRY_POLICY: RetryPolicySnapshot = {
   maxRetries: 2,
   baseDelayMs: 500,
   maxDelayMs: 5000,
   backoffMultiplier: 2,
-} as const;
+};
 
-const DEFAULT_PUSH_RETRY_POLICY = {
+const BASE_PUSH_RETRY_POLICY: RetryPolicySnapshot = {
   maxRetries: 2,
   baseDelayMs: 800,
   maxDelayMs: 8000,
   backoffMultiplier: 2,
-} as const;
+};
 
 function parseSyncSettings(raw: string | null): SyncSettingsState {
   if (!raw) {
@@ -382,6 +392,9 @@ export function useActivityModel(): ActivityModel {
     lastSyncAt: null,
     message: 'not configured',
   });
+  const [syncTelemetryEntries, setSyncTelemetryEntries] = useState<SyncTelemetryEntry[]>(() =>
+    parseSyncTelemetry(readStoredValue(storage, DESKTOP_STORAGE_KEYS.syncTelemetry)),
+  );
   const [reportSettings, setReportSettings] = useState<AiProviderSettings>(() =>
     parseReportSettings(readStoredValue(storage, DESKTOP_STORAGE_KEYS.reportSettings)),
   );
@@ -441,6 +454,14 @@ export function useActivityModel(): ActivityModel {
   }, [storage, syncSettings]);
 
   useEffect(() => {
+    writeStoredValue(
+      storage,
+      DESKTOP_STORAGE_KEYS.syncTelemetry,
+      stringifySyncTelemetry(syncTelemetryEntries),
+    );
+  }, [storage, syncTelemetryEntries]);
+
+  useEffect(() => {
     writeStoredValue(storage, DESKTOP_STORAGE_KEYS.reportSettings, JSON.stringify(reportSettings));
   }, [reportSettings, storage]);
 
@@ -494,6 +515,26 @@ export function useActivityModel(): ActivityModel {
     [categorySummaries],
   );
   const reportHistory = useMemo(() => listRecentReportHistory(reportArtifacts, 24), [reportArtifacts]);
+  const syncTelemetrySummary = useMemo(
+    () => summarizeSyncTelemetry(syncTelemetryEntries, 'sync'),
+    [syncTelemetryEntries],
+  );
+  const pushTelemetrySummary = useMemo(
+    () => summarizeSyncTelemetry(syncTelemetryEntries, 'push'),
+    [syncTelemetryEntries],
+  );
+  const syncRetryTuning = useMemo(
+    () => tuneRetryPolicyFromTelemetry(BASE_SYNC_RETRY_POLICY, syncTelemetrySummary),
+    [syncTelemetrySummary],
+  );
+  const pushRetryTuning = useMemo(
+    () => tuneRetryPolicyFromTelemetry(BASE_PUSH_RETRY_POLICY, pushTelemetrySummary),
+    [pushTelemetrySummary],
+  );
+  const syncIntervalTuning = useMemo(
+    () => tuneSyncIntervalFromTelemetry(syncSettings.syncIntervalMinutes, syncTelemetrySummary),
+    [syncSettings.syncIntervalMinutes, syncTelemetrySummary],
+  );
 
   const addManual = useCallback(
     (title: string, minutes: number) => {
@@ -606,8 +647,15 @@ export function useActivityModel(): ActivityModel {
       return;
     }
 
+    const startedAtMs = Date.now();
+    let retries = 0;
+
     syncInFlightRef.current = true;
-    setSyncStatus((current) => ({ ...current, syncing: true, message: 'syncing...' }));
+    setSyncStatus((current) => ({
+      ...current,
+      syncing: true,
+      message: `syncing... (${syncRetryTuning.profile} retry, ${syncIntervalTuning.effectiveIntervalMinutes}m interval)`,
+    }));
 
     try {
       const dayEvents = storeRef.current?.listEventsForDay(day) ?? [];
@@ -631,7 +679,10 @@ export function useActivityModel(): ActivityModel {
               }
             : undefined,
           retry: {
-            policy: DEFAULT_SYNC_RETRY_POLICY,
+            policy: syncRetryTuning.policy,
+            onRetry: () => {
+              retries += 1;
+            },
           },
         },
       );
@@ -643,26 +694,63 @@ export function useActivityModel(): ActivityModel {
 
       const totalObjectsRead =
         result.objectsRead + result.annotationObjectsRead + result.reportObjectsRead;
+      const completedAtMs = Date.now();
 
       setSyncStatus({
         syncing: false,
-        lastSyncAt: Date.now(),
+        lastSyncAt: completedAtMs,
         message:
           `synced ${result.mergedEvents.length} events, ` +
           `${result.mergedAnnotations.size} annotations, ` +
-          `${result.mergedReports.size} reports from ${totalObjectsRead} object(s)`,
+          `${result.mergedReports.size} reports from ${totalObjectsRead} object(s)` +
+          ` · policy=${syncRetryTuning.profile}`,
       });
+      setSyncTelemetryEntries((current) =>
+        appendSyncTelemetry(current, {
+          kind: 'sync',
+          ok: true,
+          startedAtMs,
+          endedAtMs: completedAtMs,
+          durationMs: completedAtMs - startedAtMs,
+          retries,
+          policy: syncRetryTuning.policy,
+          intervalMinutes: syncIntervalTuning.effectiveIntervalMinutes,
+        }),
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : 'unknown sync error';
+      const completedAtMs = Date.now();
       setSyncStatus({
         syncing: false,
         lastSyncAt: null,
         message,
       });
+      setSyncTelemetryEntries((current) =>
+        appendSyncTelemetry(current, {
+          kind: 'sync',
+          ok: false,
+          startedAtMs,
+          endedAtMs: completedAtMs,
+          durationMs: completedAtMs - startedAtMs,
+          retries,
+          policy: syncRetryTuning.policy,
+          intervalMinutes: syncIntervalTuning.effectiveIntervalMinutes,
+          errorMessage: message,
+        }),
+      );
     } finally {
       syncInFlightRef.current = false;
     }
-  }, [day, deviceId, forceRefresh, reportArtifacts, syncSettings]);
+  }, [
+    day,
+    deviceId,
+    forceRefresh,
+    reportArtifacts,
+    syncIntervalTuning.effectiveIntervalMinutes,
+    syncRetryTuning.policy,
+    syncRetryTuning.profile,
+    syncSettings,
+  ]);
 
   const generateReportNow = useCallback(async () => {
     if (reportInFlightRef.current) {
@@ -737,8 +825,15 @@ export function useActivityModel(): ActivityModel {
       return;
     }
 
+    const startedAtMs = Date.now();
+    let retries = 0;
+
     pushInFlightRef.current = true;
-    setReportStatus((current) => ({ ...current, pushing: true, message: 'pushing report...' }));
+    setReportStatus((current) => ({
+      ...current,
+      pushing: true,
+      message: `pushing report... (${pushRetryTuning.profile} retry)`,
+    }));
 
     try {
       const activePeriod = parseReportArtifactId(activeReportId);
@@ -749,27 +844,63 @@ export function useActivityModel(): ActivityModel {
         reportTextState,
         {
           retry: {
-            policy: DEFAULT_PUSH_RETRY_POLICY,
+            policy: pushRetryTuning.policy,
+            onRetry: () => {
+              retries += 1;
+            },
           },
         },
       );
+      const completedAtMs = Date.now();
       setReportStatus((current) => ({
         ...current,
         pushing: false,
-        lastPushedAt: pushed.pushed > 0 ? Date.now() : current.lastPushedAt,
-        message: pushed.message,
+        lastPushedAt: pushed.pushed > 0 ? completedAtMs : current.lastPushedAt,
+        message: `${pushed.message} · policy=${pushRetryTuning.profile}`,
       }));
+      setSyncTelemetryEntries((current) =>
+        appendSyncTelemetry(current, {
+          kind: 'push',
+          ok: pushed.failed === 0,
+          startedAtMs,
+          endedAtMs: completedAtMs,
+          durationMs: completedAtMs - startedAtMs,
+          retries,
+          policy: pushRetryTuning.policy,
+          errorMessage: pushed.failed === 0 ? undefined : pushed.message,
+        }),
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : 'unknown push error';
+      const completedAtMs = Date.now();
       setReportStatus((current) => ({
         ...current,
         pushing: false,
         message,
       }));
+      setSyncTelemetryEntries((current) =>
+        appendSyncTelemetry(current, {
+          kind: 'push',
+          ok: false,
+          startedAtMs,
+          endedAtMs: completedAtMs,
+          durationMs: completedAtMs - startedAtMs,
+          retries,
+          policy: pushRetryTuning.policy,
+          errorMessage: message,
+        }),
+      );
     } finally {
       pushInFlightRef.current = false;
     }
-  }, [activeReportId, day, pushSettings, reportTextState]);
+  }, [
+    activeReportId,
+    day,
+    pushRetryTuning.policy,
+    pushRetryTuning.profile,
+    pushSettings,
+    reportTextState,
+  ]);
 
   useEffect(() => {
     if (!syncSettings.enabled) {
@@ -778,12 +909,12 @@ export function useActivityModel(): ActivityModel {
 
     const timer = window.setInterval(() => {
       void runSyncNow();
-    }, syncSettings.syncIntervalMinutes * 60 * 1000);
+    }, syncIntervalTuning.effectiveIntervalMinutes * 60 * 1000);
 
     return () => {
       window.clearInterval(timer);
     };
-  }, [runSyncNow, syncSettings.enabled, syncSettings.syncIntervalMinutes]);
+  }, [runSyncNow, syncIntervalTuning.effectiveIntervalMinutes, syncSettings.enabled]);
 
   return {
     day,

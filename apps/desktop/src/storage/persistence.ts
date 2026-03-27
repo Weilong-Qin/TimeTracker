@@ -54,6 +54,7 @@ export const DESKTOP_STORAGE_KEYS = {
   browserBridgeEnabled: 'timetracker.desktop.browser-bridge-enabled',
   browserBridgeSnapshot: 'timetracker.desktop.browser-bridge-snapshot',
   syncSettings: 'timetracker.desktop.sync-settings',
+  syncTelemetry: 'timetracker.desktop.sync-telemetry',
   reportSettings: 'timetracker.desktop.report-settings',
   reportArtifacts: 'timetracker.desktop.reports',
   pushSettings: 'timetracker.desktop.push-settings',
