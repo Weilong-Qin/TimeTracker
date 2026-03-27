@@ -1,0 +1,54 @@
+{
+  "id": "time-tracker-ai-recap",
+  "name": "time-tracker-ai-recap",
+  "title": "brainstorm: 时间追踪与AI复盘APP",
+  "description": "",
+  "status": "in_progress",
+  "dev_type": "fullstack",
+  "scope": null,
+  "priority": "P2",
+  "creator": "weilong",
+  "assignee": "weilong",
+  "createdAt": "2026-03-27",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "master",
+  "worktree_path": null,
+  "current_phase": 1,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check"
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/desktop/",
+    "apps/mobile/",
+    "packages/core/",
+    "packages/sync-r2/",
+    "packages/reporting/",
+    "docs/architecture/pr1-foundation.md",
+    "docs/architecture/pr2-capture-ui.md",
+    "docs/architecture/pr3-r2-sync-engine.md",
+    "docs/architecture/pr4-optional-report-and-push.md"
+  ],
+  "notes": "PR1 + PR2 + PR3 delivered, plus PR4 optional AI report/push baseline with local fallback and non-blocking failure handling.",
+  "meta": {}
+}

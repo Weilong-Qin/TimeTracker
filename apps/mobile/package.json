@@ -1,0 +1,15 @@
+{
+  "name": "@timetracker/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@timetracker/core": "workspace:*",
+    "@timetracker/sync-r2": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.json --noEmit"
+  }
+}

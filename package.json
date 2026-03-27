@@ -1,0 +1,16 @@
+{
+  "name": "timetracker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Cross-device time tracking and AI recap app",
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "typescript": "^5.8.0"
+  }
+}

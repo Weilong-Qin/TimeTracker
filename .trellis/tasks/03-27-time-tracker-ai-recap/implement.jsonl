@@ -1,0 +1,14 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend development guide"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/tasks/03-27-time-tracker-ai-recap/prd.md", "reason": "Confirmed product requirements"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Cross-device sync and data flow boundaries"}
+{"file": ".trellis/spec/guides/pre-implementation-checklist.md", "reason": "Pre-change checklist for new modules"}
+{"file": ".trellis/spec/backend/database.md", "reason": "File and data persistence patterns"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Error contract and recovery behavior"}
+{"file": ".trellis/spec/backend/logging.md", "reason": "Structured logging conventions"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Backend quality baseline"}
+{"file": ".trellis/spec/frontend/components.md", "reason": "Frontend component and accessibility baseline"}
+{"file": ".trellis/spec/frontend/hooks.md", "reason": "Hook structure and async state rules"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "State ownership boundaries"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Shared contract typing constraints"}

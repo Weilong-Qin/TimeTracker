@@ -1,0 +1,6 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-backend/SKILL.md", "reason": "Backend check spec"}
+{"file": ".agents/skills/check-frontend/SKILL.md", "reason": "Frontend check spec"}
+{"file": ".trellis/tasks/03-27-time-tracker-ai-recap/prd.md", "reason": "Validate implementation against accepted scope"}
+{"file": ".trellis/spec/backend/quality.md", "reason": "Backend quality check"}
+{"file": ".trellis/spec/frontend/quality.md", "reason": "Frontend quality check"}
