@@ -1,7 +1,63 @@
 import type { ActivityEvent, Annotation, PendingInboxItem } from '@timetracker/core';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatClock, formatDuration } from './lib/format.js';
 import { useActivityModel } from './hooks/use-activity-model.js';
+
+interface QuickCategoryPreset {
+  value: string;
+  label: string;
+  tags: string[];
+}
+
+const QUICK_CATEGORY_PRESETS: QuickCategoryPreset[] = [
+  { value: 'work', label: '工作', tags: ['focus'] },
+  { value: 'learning', label: '学习', tags: ['reading'] },
+  { value: 'entertainment', label: '娱乐', tags: ['break'] },
+  { value: 'admin', label: '杂务', tags: ['ops'] },
+];
+
+const QUICK_TAG_PRESETS = ['coding', 'meeting', 'review', 'docs', 'research'] as const;
+
+function parseTagsRaw(raw: string): string[] {
+  return raw
+    .split(',')
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+function toTagsRaw(tags: string[]): string {
+  return tags.join(', ');
+}
+
+function mergeUniqueTags(base: string[], incoming: string[]): string[] {
+  const merged = new Set(base);
+  for (const tag of incoming) {
+    if (tag.trim()) {
+      merged.add(tag.trim());
+    }
+  }
+  return [...merged];
+}
+
+function inferInboxSuggestion(item: PendingInboxItem): QuickCategoryPreset {
+  const key = item.resourceKey.toLowerCase();
+  const title = (item.resourceTitle ?? '').toLowerCase();
+  const subject = `${key} ${title}`;
+
+  if (key.startsWith('/workspace/') || subject.includes('github') || subject.includes('jira') || subject.includes('project')) {
+    return { value: 'work', label: '建议: 工作', tags: ['project'] };
+  }
+
+  if (subject.includes('youtube') || subject.includes('bilibili') || subject.includes('music') || subject.includes('video')) {
+    return { value: 'entertainment', label: '建议: 娱乐', tags: ['media'] };
+  }
+
+  if (key.startsWith('doc://') || subject.includes('docs') || subject.includes('article') || subject.includes('read')) {
+    return { value: 'learning', label: '建议: 学习', tags: ['reading'] };
+  }
+
+  return { value: 'work', label: '建议: 工作', tags: ['focus'] };
+}
 
 interface EventRowProps {
   event: ActivityEvent;
@@ -12,6 +68,20 @@ interface EventRowProps {
 function EventRow({ event, annotation, onSave }: EventRowProps) {
   const [primaryCategory, setPrimaryCategory] = useState(annotation?.primaryCategory ?? '');
   const [tagsRaw, setTagsRaw] = useState(annotation?.tags.join(', ') ?? '');
+  const appliedTags = useMemo(() => parseTagsRaw(tagsRaw), [tagsRaw]);
+
+  const applyPreset = (preset: QuickCategoryPreset): void => {
+    const nextTags = mergeUniqueTags(appliedTags, preset.tags);
+    const nextTagsRaw = toTagsRaw(nextTags);
+    setPrimaryCategory(preset.value);
+    setTagsRaw(nextTagsRaw);
+    onSave(event.eventId, preset.value, nextTagsRaw);
+  };
+
+  const appendQuickTag = (tag: string): void => {
+    const nextTags = mergeUniqueTags(appliedTags, [tag]);
+    setTagsRaw(toTagsRaw(nextTags));
+  };
 
   return (
     <article className="event-row">
@@ -24,7 +94,29 @@ function EventRow({ event, annotation, onSave }: EventRowProps) {
         </div>
       </div>
 
-      <div className="event-tagbox">
+      <form
+        className="event-tagbox"
+        onSubmit={(submitEvent) => {
+          submitEvent.preventDefault();
+          onSave(event.eventId, primaryCategory, tagsRaw);
+        }}
+      >
+        <div className="quick-actions">
+          <span className="quick-title">一键分类</span>
+          {QUICK_CATEGORY_PRESETS.map((preset) => (
+            <button key={preset.value} type="button" className="chip" onClick={() => applyPreset(preset)}>
+              {preset.label}
+            </button>
+          ))}
+        </div>
+        <div className="quick-actions">
+          <span className="quick-title">快捷标签</span>
+          {QUICK_TAG_PRESETS.map((tag) => (
+            <button key={tag} type="button" className="chip subtle" onClick={() => appendQuickTag(tag)}>
+              +{tag}
+            </button>
+          ))}
+        </div>
         <label>
           主分类
           <input
@@ -41,10 +133,10 @@ function EventRow({ event, annotation, onSave }: EventRowProps) {
             placeholder="project, coding, docs"
           />
         </label>
-        <button type="button" onClick={() => onSave(event.eventId, primaryCategory, tagsRaw)}>
+        <button type="submit">
           保存标注
         </button>
-      </div>
+      </form>
     </article>
   );
 }
@@ -55,8 +147,22 @@ interface InboxRowProps {
 }
 
 function InboxRow({ item, onApply }: InboxRowProps) {
-  const [primaryCategory, setPrimaryCategory] = useState('work');
-  const [tagsRaw, setTagsRaw] = useState('');
+  const suggestion = useMemo(() => inferInboxSuggestion(item), [item]);
+  const [primaryCategory, setPrimaryCategory] = useState(suggestion.value);
+  const [tagsRaw, setTagsRaw] = useState(() => toTagsRaw(suggestion.tags));
+  const parsedTags = useMemo(() => parseTagsRaw(tagsRaw), [tagsRaw]);
+
+  useEffect(() => {
+    setPrimaryCategory(suggestion.value);
+    setTagsRaw(toTagsRaw(suggestion.tags));
+  }, [suggestion]);
+
+  const quickApply = (preset: QuickCategoryPreset): void => {
+    const mergedTags = toTagsRaw(mergeUniqueTags(parsedTags, preset.tags));
+    setPrimaryCategory(preset.value);
+    setTagsRaw(mergedTags);
+    onApply(item, preset.value, mergedTags);
+  };
 
   return (
     <article className="inbox-row">
@@ -69,7 +175,23 @@ function InboxRow({ item, onApply }: InboxRowProps) {
         </div>
       </div>
 
-      <div className="event-tagbox compact">
+      <form
+        className="event-tagbox compact"
+        onSubmit={(submitEvent) => {
+          submitEvent.preventDefault();
+          onApply(item, primaryCategory, tagsRaw);
+        }}
+      >
+        <div className="quick-actions compact">
+          <button type="button" className="chip primary" onClick={() => quickApply(suggestion)}>
+            {suggestion.label}
+          </button>
+          {QUICK_CATEGORY_PRESETS.map((preset) => (
+            <button key={preset.value} type="button" className="chip" onClick={() => quickApply(preset)}>
+              {preset.label}
+            </button>
+          ))}
+        </div>
         <label>
           分类
           <input value={primaryCategory} onChange={(inputEvent) => setPrimaryCategory(inputEvent.target.value)} />
@@ -78,10 +200,10 @@ function InboxRow({ item, onApply }: InboxRowProps) {
           标签
           <input value={tagsRaw} onChange={(inputEvent) => setTagsRaw(inputEvent.target.value)} />
         </label>
-        <button type="button" onClick={() => onApply(item, primaryCategory, tagsRaw)}>
+        <button type="submit">
           批量应用
         </button>
-      </div>
+      </form>
     </article>
   );
 }
@@ -416,7 +538,7 @@ export function App() {
 
       <section className="panel">
         <h2>批量待办箱</h2>
-        <p className="lead">将未分类片段按资源批量归类，自动应用到同资源记录。</p>
+        <p className="lead">将未分类片段按资源批量归类。可 1 步用建议分类，或 2-3 步自定义后批量应用。</p>
         <div className="list-stack">
           {pendingInbox.map((item) => (
             <InboxRow key={item.resourceKey} item={item} onApply={applyInboxRule} />

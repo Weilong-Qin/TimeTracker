@@ -314,6 +314,56 @@ button.danger {
   grid-template-columns: 1fr 1fr auto;
 }
 
+.quick-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.quick-actions.compact {
+  margin-bottom: 4px;
+}
+
+.quick-title {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+button.chip {
+  border: 1px solid var(--line);
+  background: #f0f7f5;
+  color: var(--accent-strong);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+button.chip:hover {
+  background: #def3ed;
+  transform: translateY(-1px);
+}
+
+button.chip.subtle {
+  background: #f6f5fb;
+  color: #3f4a5a;
+}
+
+button.chip.subtle:hover {
+  background: #eceafb;
+}
+
+button.chip.primary {
+  background: #dff5ee;
+  color: #0a4e43;
+  border-color: #9bcdbf;
+}
+
 .empty {
   color: var(--muted);
   padding: 16px;
