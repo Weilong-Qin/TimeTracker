@@ -1,6 +1,6 @@
-# Hook Guidelines (Bootstrap State)
+# Hook Guidelines
 
-> No React hooks exist yet in this repo. This file defines required hook patterns for first implementation.
+> Hooks are used as state orchestration boundaries in both desktop and mobile apps.
 
 ## Hook Design Rules
 
@@ -12,18 +12,15 @@
 ## Recommended Structure
 
 ```text
-renderer/src/
-  features/<feature>/hooks/
-    use<Feature>Query.ts
-    use<Feature>Mutation.ts
-    index.ts
+apps/<target>/src/hooks/
+  use<Feature>.ts
 ```
 
 ## Concrete References In This Repo
 
-- Query/mutation pattern template: `.trellis/spec/frontend/hooks.md` (this file)
-- Dependency and state pitfalls: `.trellis/spec/frontend/react-pitfalls.md`
-- IPC call boundaries: `.trellis/spec/frontend/ipc-electron.md`
+- Desktop orchestration hook: `apps/desktop/src/hooks/use-activity-model.ts`
+- Mobile orchestration hook: `apps/mobile/src/hooks/use-mobile-shell.ts`
+- Dependency/state pitfalls: `.trellis/spec/frontend/react-pitfalls.md`
 
 ## Anti-Patterns To Avoid
 

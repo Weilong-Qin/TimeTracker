@@ -1,0 +1,12 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-frontend/SKILL.md", "reason": "Frontend check spec"}
+{"file": ".trellis/spec/frontend/components.md", "reason": "semantic forms and interaction rules"}
+{"file": ".trellis/spec/frontend/hooks.md", "reason": "hook shape and dependency discipline"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "single source of truth for model state"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "strict TS contract guidance"}
+{"file": ".trellis/spec/frontend/quality.md", "reason": "frontend quality gate"}
+{"file": ".trellis/spec/guides/pre-implementation-checklist.md", "reason": "reuse and pre-change checklist"}
+{"file": "apps/desktop/src/main.tsx", "reason": "reference for react bootstrap"}
+{"file": "apps/desktop/src/hooks/use-activity-model.ts", "reason": "reference for hook based state orchestration"}
+{"file": "apps/desktop/src/styles.css", "reason": "reference for ui token and layout style"}
+{"file": "apps/mobile/src/model/mobile-shell.ts", "reason": "shared mobile model contract"}

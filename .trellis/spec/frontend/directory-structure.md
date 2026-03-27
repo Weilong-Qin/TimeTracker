@@ -1,47 +1,54 @@
-# Frontend Directory Structure (Bootstrap State)
+# Frontend Directory Structure
 
-> This repository currently has no runtime frontend code. This file defines the expected structure for first implementation.
+> This repository contains runtime frontend code for both desktop and mobile app targets.
 
 ## Current Reality
 
-Existing frontend-related assets are documentation only:
-
-- `.trellis/spec/frontend/*.md` (guidelines and templates)
-- `.trellis/workspace/*` (session journals, not UI code)
-
-## Target Structure When UI Is Added
+Current frontend source layout:
 
 ```text
-src/
-  main/                # Electron main process
-  preload/             # contextBridge and typed renderer API
-  renderer/
+apps/
+  desktop/
     src/
-      app/             # route/page entry
-      components/      # reusable UI components
-      features/        # feature-scoped modules
-      hooks/           # shared hooks
-      styles/          # css/tokens
-  shared/
-    constants/         # cross-layer constants (IPC channels, enums)
-    types/             # shared contracts
+      App.tsx
+      hooks/
+      styles.css
+      ...
+  mobile/
+    src/
+      App.tsx
+      hooks/
+      model/
+      styles.css
+      ...
+```
+
+## Target Structure (Per App)
+
+```text
+apps/<target>/src/
+  App.tsx              # app-level composition
+  hooks/               # state orchestration hooks
+  model/               # target-specific view model helpers (if needed)
+  lib/                 # formatting/util helpers
+  styles.css           # target-level styles entry
 ```
 
 ## Placement Rules
 
-1. Keep UI concerns in `renderer/src/`; do not import Electron main modules directly.
-2. Keep cross-layer contracts in `src/shared/`.
+1. Keep UI concerns inside `apps/<target>/src/`; do not import backend process modules directly.
+2. Keep cross-layer contracts in shared workspace packages (for example `@timetracker/core`).
 3. Keep feature-local UI and hooks grouped by feature before promoting to global folders.
 4. Introduce `index.ts` re-export files only when they reduce import noise.
 
 ## Real Reference Patterns Available Today
 
-- Layer separation pattern: `.trellis/spec/frontend/ipc-electron.md`
-- Shared contract concept: `.trellis/spec/frontend/type-safety.md`
-- Current backend modular separation analogue: `.trellis/scripts/common/` vs `.trellis/scripts/*.py`
+- Desktop app shape: `apps/desktop/src/`
+- Mobile app shape: `apps/mobile/src/`
+- Shared contract consumption: `apps/mobile/src/model/mobile-shell.ts` importing from `@timetracker/core`
 
 ## Anti-Patterns To Avoid
 
-- Flat renderer directories with unrelated feature code mixed together.
+- Flat app directories with unrelated feature code mixed together.
 - Defining IPC channel strings in component files.
 - Duplicating the same type in multiple layers.

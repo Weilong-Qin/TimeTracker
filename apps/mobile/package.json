@@ -5,9 +5,20 @@
   "type": "module",
   "dependencies": {
     "@timetracker/core": "workspace:*",
-    "@timetracker/sync-r2": "workspace:*"
+    "@timetracker/sync-r2": "workspace:*",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^7.1.10"
   },
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "bash ./test/run-tests.sh"

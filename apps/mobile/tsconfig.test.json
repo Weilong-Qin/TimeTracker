@@ -4,7 +4,9 @@
     "rootDir": ".",
     "outDir": ".tmp-test",
     "noEmit": false,
-    "types": ["node"]
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite/client"]
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "vite.config.ts"]
 }

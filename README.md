@@ -5,7 +5,7 @@ Cross-device time tracking and AI recap app (desktop + mobile), built with a loc
 ## Workspace Layout
 
 - `apps/desktop`: desktop app entry scaffold
-- `apps/mobile`: mobile app entry scaffold
+- `apps/mobile`: mobile web shell (React + Vite) with manual entry and annotation flows
 - `packages/core`: shared domain model and local event store
 - `packages/sync-r2`: R2 sync contracts and scheduler helpers
 - `packages/reporting`: optional AI report and push adapters
@@ -38,5 +38,13 @@ Current desktop app includes:
 - executable R2 sync settings + sync trigger path
 - optional AI report generation (with local fallback template)
 - optional report push adapters (Webhook / DingTalk / Feishu)
+
+Current mobile app includes:
+
+- mobile-oriented React shell with responsive UI
+- manual activity entry with optional annotation draft
+- timeline annotation editing and pending inbox batch classification
+- day summary cards and category distribution
+- local snapshot export/import for offline state handoff
 
 Real capture adapters and persistent local DB are planned for subsequent PRs.
