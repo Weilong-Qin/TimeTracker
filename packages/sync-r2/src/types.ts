@@ -1,6 +1,25 @@
 import type { SyncSettings } from '@timetracker/core';
 
+const EVENT_OBJECT_SUFFIX = '.ndjson';
+const ANNOTATION_OBJECT_SUFFIX = '.annotations.json';
+const REPORT_OBJECT_SUFFIX = '.reports.json';
+
+export type R2SyncChannel = 'events' | 'annotations' | 'reports';
+export type SyncReportPeriodType = 'daily' | 'weekly' | 'monthly';
+export type SyncReportSource = 'ai' | 'fallback' | 'manual';
+
+export interface SyncReportArtifact {
+  periodType: SyncReportPeriodType;
+  periodKey: string;
+  generatedAt: number;
+  updatedAt: number;
+  updatedByDeviceId: string;
+  source: SyncReportSource;
+  content: string;
+}
+
 export interface R2SyncObjectDescriptor {
+  channel: R2SyncChannel;
   day: string;
   deviceId: string;
   key: string;
@@ -12,25 +31,62 @@ function assertDay(day: string): void {
   }
 }
 
-export function buildDailyDeviceObjectKey(day: string, deviceId: string): string {
-  assertDay(day);
-
+function assertDeviceId(deviceId: string): void {
   if (!deviceId.trim()) {
     throw new Error('deviceId is required');
   }
-
-  return `${day}/${deviceId}.ndjson`;
 }
 
-export function parseDailyDeviceObjectKey(key: string): R2SyncObjectDescriptor {
-  const match = key.match(/^(\d{4}-\d{2}-\d{2})\/([^/]+)\.ndjson$/);
+function buildDailyDeviceChannelObjectKey(day: string, deviceId: string, suffix: string): string {
+  assertDay(day);
+  assertDeviceId(deviceId);
+  return `${day}/${deviceId}${suffix}`;
+}
+
+function parseDailyDeviceChannelObjectKey(
+  key: string,
+  suffix: string,
+  channel: R2SyncChannel,
+): R2SyncObjectDescriptor {
+  const escapedSuffix = suffix
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = key.match(new RegExp(`^(\\d{4}-\\d{2}-\\d{2})/([^/]+)${escapedSuffix}$`));
 
   if (!match) {
-    throw new Error(`Invalid sync object key: ${key}`);
+    throw new Error(`Invalid ${channel} sync object key: ${key}`);
   }
 
   const [, day, deviceId] = match;
-  return { day, deviceId, key };
+  return {
+    channel,
+    day,
+    deviceId,
+    key,
+  };
+}
+
+export function buildDailyDeviceObjectKey(day: string, deviceId: string): string {
+  return buildDailyDeviceChannelObjectKey(day, deviceId, EVENT_OBJECT_SUFFIX);
+}
+
+export function buildDailyDeviceAnnotationsObjectKey(day: string, deviceId: string): string {
+  return buildDailyDeviceChannelObjectKey(day, deviceId, ANNOTATION_OBJECT_SUFFIX);
+}
+
+export function buildDailyDeviceReportsObjectKey(day: string, deviceId: string): string {
+  return buildDailyDeviceChannelObjectKey(day, deviceId, REPORT_OBJECT_SUFFIX);
+}
+
+export function parseDailyDeviceObjectKey(key: string): R2SyncObjectDescriptor {
+  return parseDailyDeviceChannelObjectKey(key, EVENT_OBJECT_SUFFIX, 'events');
+}
+
+export function parseDailyDeviceAnnotationsObjectKey(key: string): R2SyncObjectDescriptor {
+  return parseDailyDeviceChannelObjectKey(key, ANNOTATION_OBJECT_SUFFIX, 'annotations');
+}
+
+export function parseDailyDeviceReportsObjectKey(key: string): R2SyncObjectDescriptor {
+  return parseDailyDeviceChannelObjectKey(key, REPORT_OBJECT_SUFFIX, 'reports');
 }
 
 export function validateSyncSettings(input: SyncSettings): { ok: boolean; issues: string[] } {

@@ -1,48 +1,32 @@
-import {
-  InMemoryActivityStore,
-  createManualEntry,
-  type ActivityEvent,
-} from '@timetracker/core';
+import { bootstrapMobileShell, toDayString } from './model/mobile-shell.js';
 
-const store = new InMemoryActivityStore();
-
-function createBootstrapEvent(deviceId: string): ActivityEvent {
-  const now = Date.now();
-
-  return {
-    eventId: `${deviceId}-${now}`,
-    deviceId,
-    resourceKind: 'manual',
-    resourceKey: 'manual://reflection',
-    resourceTitle: 'Daily reflection draft',
-    startedAt: now - 10 * 60 * 1000,
-    endedAt: now,
-    source: 'manual',
-  };
-}
-
-export function bootstrapMobileDemo(deviceId: string): void {
-  const autoEvent = createBootstrapEvent(deviceId);
-  const manualEvent = createManualEntry({
-    eventId: `${deviceId}-manual-${Date.now()}`,
-    deviceId,
-    title: 'Gym and commute',
-    startAt: Date.now() - 30 * 60 * 1000,
-    endAt: Date.now() - 20 * 60 * 1000,
+export function runMobileShellBootstrap(deviceId: string, nowMs = Date.now()): void {
+  const shell = bootstrapMobileShell(deviceId, nowMs);
+  const offDeviceItem = shell.addManualEntryWithAnnotation({
+    title: 'Commute and planning',
+    minutes: 25,
+    endAtMs: nowMs - 2 * 60 * 1000,
+    primaryCategory: 'learning',
+    tagsRaw: 'mobile, commute, podcast',
   });
+  shell.saveAnnotationDraft({
+    eventId: offDeviceItem.event.eventId,
+    primaryCategory: 'learning',
+    tagsRaw: 'mobile, commute, podcast, recap',
+    note: 'Updated on mobile shell bootstrap flow',
+    updatedAt: nowMs + 1,
+  });
+  const view = shell.getView(toDayString(nowMs));
 
-  store.appendEvents([autoEvent, manualEvent]);
-
-  const day = new Date().toISOString().slice(0, 10);
-  const summary = store.summarizeDay(day);
-
-  console.log('[mobile] bootstrap summary', {
-    day,
-    stackedMs: summary.stackedMs,
-    naturalMs: summary.naturalMs,
+  console.log('[mobile] shell ready', {
+    day: view.day,
+    timelineCount: view.timeline.length,
+    pendingInboxCount: view.stats.pendingInboxCount,
+    stackedMs: view.stats.stackedMs,
+    naturalMs: view.stats.naturalMs,
   });
 }
 
 if (process.env.NODE_ENV !== 'test') {
-  bootstrapMobileDemo('mobile-local');
+  runMobileShellBootstrap('mobile-local');
 }

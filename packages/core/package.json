@@ -9,6 +9,6 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "tsc -p tsconfig.json --noEmit"
+    "test": "bash -lc 'rm -rf .tmp-test && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json && node --test .tmp-test/test/**/*.test.js; code=$?; rm -rf .tmp-test; exit $code'"
   }
 }

@@ -1,12 +1,33 @@
 import { mergeAnnotations, resolveLww } from './annotation.js';
 import { mergeEventBatches } from './event-log.js';
 import { summarizeDaily, type DailySummary } from './classification.js';
+import {
+  InMemoryActivityEventRepository,
+  InMemoryAnnotationRepository,
+  type ActivityEventRepository,
+  type AnnotationRepository,
+} from './repository.js';
 import type { ActivityEvent, Annotation } from './types.js';
 
 export interface AppendEventsResult {
   added: number;
   duplicates: number;
   invalid: number;
+}
+
+export interface ActivityStore {
+  appendEvents(events: ActivityEvent[]): AppendEventsResult;
+  upsertAnnotation(eventId: string, annotation: Annotation): Annotation;
+  mergeRemoteAnnotations(incoming: ReadonlyMap<string, Annotation>): void;
+  listEventsForDay(day: string): ActivityEvent[];
+  summarizeDay(day: string): DailySummary;
+  getAnnotations(): ReadonlyMap<string, Annotation>;
+  getAllEvents(): ActivityEvent[];
+}
+
+export interface ActivityStoreRepositories {
+  eventRepository: ActivityEventRepository;
+  annotationRepository: AnnotationRepository;
 }
 
 function dayToUtcRange(day: string): { start: number; end: number } {
@@ -20,19 +41,25 @@ function dayToUtcRange(day: string): { start: number; end: number } {
   return { start, end };
 }
 
-export class InMemoryActivityStore {
-  private readonly events = new Map<string, ActivityEvent>();
+function sortEventsByTime(events: ActivityEvent[]): ActivityEvent[] {
+  return [...events].sort((a, b) => a.startedAt - b.startedAt);
+}
 
-  private readonly annotations = new Map<string, Annotation>();
+export class RepositoryBackedActivityStore implements ActivityStore {
+  private readonly eventRepository: ActivityEventRepository;
+
+  private readonly annotationRepository: AnnotationRepository;
+
+  constructor(repositories: ActivityStoreRepositories) {
+    this.eventRepository = repositories.eventRepository;
+    this.annotationRepository = repositories.annotationRepository;
+  }
 
   appendEvents(events: ActivityEvent[]): AppendEventsResult {
-    const beforeCount = this.events.size;
-    const merged = mergeEventBatches([[...this.events.values()], events]);
-
-    this.events.clear();
-    for (const event of merged.merged) {
-      this.events.set(event.eventId, event);
-    }
+    const current = this.eventRepository.readAll();
+    const beforeCount = current.length;
+    const merged = mergeEventBatches([current, events]);
+    this.eventRepository.replaceAll(merged.merged);
 
     return {
       added: Math.max(0, merged.merged.length - beforeCount),
@@ -42,36 +69,44 @@ export class InMemoryActivityStore {
   }
 
   upsertAnnotation(eventId: string, annotation: Annotation): Annotation {
-    const selected = resolveLww(this.annotations.get(eventId), annotation);
-    this.annotations.set(eventId, selected);
-    return selected;
+    const current = this.annotationRepository.readAll().get(eventId);
+    const selected = resolveLww(current, annotation);
+    return this.annotationRepository.upsert(eventId, selected);
   }
 
   mergeRemoteAnnotations(incoming: ReadonlyMap<string, Annotation>): void {
-    const merged = mergeAnnotations(this.annotations, incoming);
-    this.annotations.clear();
-    for (const [eventId, annotation] of merged.entries()) {
-      this.annotations.set(eventId, annotation);
-    }
+    const merged = mergeAnnotations(this.annotationRepository.readAll(), incoming);
+    this.annotationRepository.replaceAll(merged);
   }
 
   listEventsForDay(day: string): ActivityEvent[] {
     const { start, end } = dayToUtcRange(day);
 
-    return [...this.events.values()]
+    return this.eventRepository
+      .readAll()
       .filter((event) => event.startedAt <= end && event.endedAt >= start)
       .sort((a, b) => a.startedAt - b.startedAt);
   }
 
   summarizeDay(day: string): DailySummary {
-    return summarizeDaily(this.listEventsForDay(day), this.annotations);
+    return summarizeDaily(this.listEventsForDay(day), this.annotationRepository.readAll());
   }
 
   getAnnotations(): ReadonlyMap<string, Annotation> {
-    return this.annotations;
+    return this.annotationRepository.readAll();
   }
 
   getAllEvents(): ActivityEvent[] {
-    return [...this.events.values()].sort((a, b) => a.startedAt - b.startedAt);
+    return sortEventsByTime(this.eventRepository.readAll());
+  }
+}
+
+export class InMemoryActivityStore extends RepositoryBackedActivityStore {
+  constructor(repositories?: Partial<ActivityStoreRepositories>) {
+    super({
+      eventRepository: repositories?.eventRepository ?? new InMemoryActivityEventRepository(),
+      annotationRepository:
+        repositories?.annotationRepository ?? new InMemoryAnnotationRepository(),
+    });
   }
 }
