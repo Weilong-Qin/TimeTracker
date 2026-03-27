@@ -260,3 +260,62 @@ Reworked desktop information architecture, moved advanced settings into collapsi
 ### Next Steps
 
 - None - task complete
+
+
+## Session 7: Complete mobile app implementation
+
+**Date**: 2026-03-28
+**Task**: Complete mobile app implementation
+
+### Summary
+
+(Add summary)
+
+### Main Changes
+
+| Area | Description |
+|------|-------------|
+| Mobile app runtime | Upgraded `apps/mobile` from model-only shell to runnable React + Vite app (`index.html`, `vite.config.ts`, `src/main.tsx`). |
+| Mobile UX flows | Implemented full mobile UI for manual entry, timeline annotation editing, pending inbox batch classification, summary cards, and category distribution (`apps/mobile/src/App.tsx`, `apps/mobile/src/styles.css`). |
+| State orchestration | Added `useMobileShell` hook as single source of truth for UI/model integration (`apps/mobile/src/hooks/use-mobile-shell.ts`). |
+| Snapshot IO | Added validated snapshot parse/stringify flow and import/export behavior (`apps/mobile/src/model/snapshot.ts`). |
+| Validation | Added mobile snapshot tests and verified lint/typecheck/test/build for mobile plus full workspace checks. |
+| Docs/spec sync | Updated frontend specs to reflect that runtime frontend code now exists (`.trellis/spec/frontend/index.md`, `directory-structure.md`, `components.md`, `hooks.md`) and updated `README.md`. |
+
+**Updated Files**:
+- `apps/mobile/package.json`
+- `apps/mobile/tsconfig.json`
+- `apps/mobile/tsconfig.test.json`
+- `apps/mobile/index.html`
+- `apps/mobile/vite.config.ts`
+- `apps/mobile/src/main.tsx`
+- `apps/mobile/src/App.tsx`
+- `apps/mobile/src/styles.css`
+- `apps/mobile/src/hooks/use-mobile-shell.ts`
+- `apps/mobile/src/lib/format.ts`
+- `apps/mobile/src/model/snapshot.ts`
+- `apps/mobile/test/mobile-snapshot.test.ts`
+- `.trellis/spec/frontend/index.md`
+- `.trellis/spec/frontend/directory-structure.md`
+- `.trellis/spec/frontend/components.md`
+- `.trellis/spec/frontend/hooks.md`
+- `README.md`
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `415aefc` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
