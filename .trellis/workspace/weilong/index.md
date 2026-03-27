@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 5
-- **Last Active**: 2026-03-27
+- **Total Sessions**: 6
+- **Last Active**: 2026-03-28
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~230 | Active |
+| `journal-1.md` | ~262 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits |
 |---|------|-------|---------|
+| 6 | 2026-03-28 | Optimize desktop UI hierarchy and modern UX feedback | `3b52f87` |
 | 5 | 2026-03-27 | M4 reliability, append optimization, and sync encryption | `8070c5c` |
 | 4 | 2026-03-27 | M3-07 beta hardening closeout | `18f3e69` |
 | 3 | 2026-03-27 | M2-05 timeline/inbox UX fast classification | `be86ca7` |
