@@ -1,0 +1,6 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-frontend/SKILL.md", "reason": "Frontend check spec"}
+{"file": ".trellis/spec/frontend/components.md", "reason": "Review semantic and interaction quality"}
+{"file": ".trellis/spec/frontend/quality.md", "reason": "Run frontend delivery quality checklist"}
+{"file": ".trellis/spec/frontend/css-design.md", "reason": "Validate visual consistency and token usage"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Validate type safety after refactor"}

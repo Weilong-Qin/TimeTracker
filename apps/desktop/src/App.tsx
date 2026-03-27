@@ -294,6 +294,41 @@ function CategoryDistributionChart({ categories }: CategoryDistributionChartProp
   );
 }
 
+type StatusTone = 'neutral' | 'working' | 'success' | 'warning' | 'error';
+
+function inferStatusTone(message: string): StatusTone {
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes('error') ||
+    normalized.includes('fail') ||
+    normalized.includes('invalid') ||
+    normalized.includes('timeout')
+  ) {
+    return 'error';
+  }
+
+  if (
+    normalized.includes('success') ||
+    normalized.includes('synced') ||
+    normalized.includes('pushed') ||
+    normalized.includes('generated')
+  ) {
+    return 'success';
+  }
+
+  if (
+    normalized.includes('disabled') ||
+    normalized.includes('not configured') ||
+    normalized.includes('idle') ||
+    normalized.includes('empty')
+  ) {
+    return 'warning';
+  }
+
+  return 'neutral';
+}
+
 export function App() {
   const {
     day,
@@ -331,6 +366,63 @@ export function App() {
 
   const [manualTitle, setManualTitle] = useState('离线活动');
   const [manualMinutes, setManualMinutes] = useState(20);
+  const syncTone = useMemo<StatusTone>(() => {
+    if (syncStatus.syncing) {
+      return 'working';
+    }
+
+    if (!syncSettings.enabled) {
+      return 'warning';
+    }
+
+    return inferStatusTone(syncStatus.message);
+  }, [syncSettings.enabled, syncStatus.message, syncStatus.syncing]);
+  const reportTone = useMemo<StatusTone>(() => {
+    if (reportStatus.generating || reportStatus.pushing) {
+      return 'working';
+    }
+
+    return inferStatusTone(reportStatus.message);
+  }, [reportStatus.generating, reportStatus.message, reportStatus.pushing]);
+
+  const syncHeadline = syncStatus.syncing
+    ? '同步进行中'
+    : syncTone === 'error'
+      ? '同步异常'
+      : syncTone === 'success'
+        ? '同步完成'
+        : !syncSettings.enabled
+          ? '同步未启用'
+          : '同步待处理';
+  const reportHeadline = reportStatus.generating || reportStatus.pushing
+    ? '报告处理中'
+    : reportTone === 'error'
+      ? '报告异常'
+      : reportTone === 'success'
+        ? '报告可推送'
+        : '报告待生成';
+  const syncMeta = syncStatus.lastSyncAt ? `最近同步 ${formatClock(syncStatus.lastSyncAt)}` : '尚无成功同步记录';
+  const reportMeta = reportStatus.lastPushedAt
+    ? `最近推送 ${formatClock(reportStatus.lastPushedAt)}`
+    : reportStatus.lastGeneratedAt
+      ? `最近生成 ${formatClock(reportStatus.lastGeneratedAt)}`
+      : '尚无报告历史';
+  const syncDetailLabel = syncStatus.syncing
+    ? '同步中'
+    : syncTone === 'error'
+      ? '异常'
+      : syncTone === 'success'
+        ? '已同步'
+        : !syncSettings.enabled
+          ? '未启用'
+          : '待处理';
+  const reportDetailLabel = reportStatus.generating || reportStatus.pushing
+    ? '处理中'
+    : reportTone === 'error'
+      ? '异常'
+      : reportTone === 'success'
+        ? '可用'
+        : '待处理';
 
   return (
     <main className="app-shell">
@@ -363,6 +455,18 @@ export function App() {
               </button>
             )}
           </div>
+          <div className="status-strip" aria-label="系统状态概览">
+            <article className={`status-card tone-${syncTone}`}>
+              <p className="status-card-kicker">同步状态</p>
+              <strong>{syncHeadline}</strong>
+              <small>{syncMeta}</small>
+            </article>
+            <article className={`status-card tone-${reportTone}`}>
+              <p className="status-card-kicker">报告状态</p>
+              <strong>{reportHeadline}</strong>
+              <small>{reportMeta}</small>
+            </article>
+          </div>
         </div>
       </header>
 
@@ -385,274 +489,36 @@ export function App() {
       </section>
 
       <section className="panel">
-        <h2>时长语义图</h2>
-        <p className="lead">图中明确区分自然时长与并行叠加时长，帮助快速识别并行工作密度。</p>
-        <DurationSemanticsChart naturalMs={naturalMs} stackedMs={stackedMs} />
-      </section>
-
-      <section className="panel">
-        <h2>R2 同步设置（可选）</h2>
-        <div className="sync-grid">
-          <label>
-            启用同步
-            <input
-              type="checkbox"
-              checked={syncSettings.enabled}
-              onChange={(inputEvent) => updateSyncSettings({ enabled: inputEvent.target.checked })}
-            />
-          </label>
-          <label>
-            Account ID
-            <input
-              value={syncSettings.accountId}
-              onChange={(inputEvent) => updateSyncSettings({ accountId: inputEvent.target.value.trim() })}
-              placeholder="cloudflare account id"
-            />
-          </label>
-          <label>
-            Bucket
-            <input
-              value={syncSettings.bucket}
-              onChange={(inputEvent) => updateSyncSettings({ bucket: inputEvent.target.value.trim() })}
-              placeholder="timetracker-sync"
-            />
-          </label>
-          <label>
-            Access Key ID
-            <input
-              value={syncSettings.accessKeyId}
-              onChange={(inputEvent) => updateSyncSettings({ accessKeyId: inputEvent.target.value.trim() })}
-              placeholder="R2 access key id"
-            />
-          </label>
-          <label>
-            Secret Access Key
-            <input
-              type="password"
-              value={syncSettings.secretAccessKey}
-              onChange={(inputEvent) =>
-                updateSyncSettings({
-                  secretAccessKey: inputEvent.target.value.trim(),
-                })
-              }
-              placeholder="R2 secret access key"
-            />
-          </label>
-          <label>
-            Region
-            <input
-              value={syncSettings.region}
-              onChange={(inputEvent) => updateSyncSettings({ region: inputEvent.target.value.trim() || 'auto' })}
-              placeholder="auto"
-            />
-          </label>
-          <label>
-            端到端加密口令（可选）
-            <input
-              type="password"
-              value={syncSettings.encryptionPassphrase}
-              onChange={(inputEvent) =>
-                updateSyncSettings({
-                  encryptionPassphrase: inputEvent.target.value,
-                })
-              }
-              placeholder="同步对象加密口令"
-            />
-          </label>
-          <label>
-            同步周期（分钟）
-            <select
-              value={syncSettings.syncIntervalMinutes}
-              onChange={(inputEvent) =>
-                updateSyncSettings({
-                  syncIntervalMinutes: Number(inputEvent.target.value) as 1 | 5 | 15 | 30 | 60,
-                })
-              }
-            >
-              <option value={1}>1</option>
-              <option value={5}>5</option>
-              <option value={15}>15</option>
-              <option value={30}>30</option>
-              <option value={60}>60</option>
-            </select>
-          </label>
-          <button type="button" disabled={syncStatus.syncing} onClick={() => void runSyncNow()}>
-            {syncStatus.syncing ? '同步中...' : '立即同步'}
-          </button>
+        <h2>今日操作台</h2>
+        <p className="lead">先完成关键日常操作，再按需展开高级配置。</p>
+        <div className="ops-grid">
+          <article className="subpanel">
+            <h3>手工补录</h3>
+            <div className="manual-form">
+              <label>
+                活动标题
+                <input value={manualTitle} onChange={(inputEvent) => setManualTitle(inputEvent.target.value)} />
+              </label>
+              <label>
+                时长（分钟）
+                <input
+                  type="number"
+                  min={1}
+                  value={manualMinutes}
+                  onChange={(inputEvent) => setManualMinutes(Math.max(1, Number(inputEvent.target.value)))}
+                />
+              </label>
+              <button type="button" onClick={() => addManual(manualTitle, manualMinutes)}>
+                添加补录
+              </button>
+            </div>
+          </article>
+          <article className="subpanel">
+            <h3>时长语义图</h3>
+            <p className="lead">同屏对照自然时长与叠加时长，快速判断并行负载。</p>
+            <DurationSemanticsChart naturalMs={naturalMs} stackedMs={stackedMs} />
+          </article>
         </div>
-        <p className="sync-status">
-          状态: {syncStatus.message}
-          {syncStatus.lastSyncAt ? ` · 最近同步 ${formatClock(syncStatus.lastSyncAt)}` : ''}
-        </p>
-      </section>
-
-      <section className="panel">
-        <h2>AI 报告与推送（可选）</h2>
-        <div className="sync-grid">
-          <label>
-            启用 AI 报告
-            <input
-              type="checkbox"
-              checked={reportSettings.enabled}
-              onChange={(inputEvent) => updateReportSettings({ enabled: inputEvent.target.checked })}
-            />
-          </label>
-          <label>
-            API Endpoint
-            <input
-              value={reportSettings.endpoint}
-              onChange={(inputEvent) => updateReportSettings({ endpoint: inputEvent.target.value })}
-              placeholder="https://api.openai.com/v1/responses"
-            />
-          </label>
-          <label>
-            Model
-            <input
-              value={reportSettings.model}
-              onChange={(inputEvent) => updateReportSettings({ model: inputEvent.target.value })}
-              placeholder="gpt-4.1-mini"
-            />
-          </label>
-          <label>
-            API Key
-            <input
-              type="password"
-              value={reportSettings.apiKey}
-              onChange={(inputEvent) => updateReportSettings({ apiKey: inputEvent.target.value })}
-              placeholder="sk-***"
-            />
-          </label>
-          <label>
-            请求超时(ms)
-            <input
-              type="number"
-              min={1000}
-              value={reportSettings.timeoutMs}
-              onChange={(inputEvent) =>
-                updateReportSettings({
-                  timeoutMs: Math.max(1000, Number(inputEvent.target.value) || 15000),
-                })
-              }
-            />
-          </label>
-          <div className="control-buttons">
-            <button type="button" disabled={reportStatus.generating} onClick={() => void generateReportNow()}>
-              {reportStatus.generating ? '生成中...' : '生成报告'}
-            </button>
-          </div>
-        </div>
-
-        <div className="sync-grid">
-          <label>
-            Webhook
-            <input
-              type="checkbox"
-              checked={pushSettings.webhookEnabled}
-              onChange={(inputEvent) => updatePushSettings({ webhookEnabled: inputEvent.target.checked })}
-            />
-          </label>
-          <label>
-            Webhook URL
-            <input
-              value={pushSettings.webhookUrl}
-              onChange={(inputEvent) => updatePushSettings({ webhookUrl: inputEvent.target.value })}
-              placeholder="https://example.com/webhook"
-            />
-          </label>
-          <label>
-            钉钉机器人
-            <input
-              type="checkbox"
-              checked={pushSettings.dingTalkEnabled}
-              onChange={(inputEvent) => updatePushSettings({ dingTalkEnabled: inputEvent.target.checked })}
-            />
-          </label>
-          <label>
-            钉钉 Webhook
-            <input
-              value={pushSettings.dingTalkWebhookUrl}
-              onChange={(inputEvent) => updatePushSettings({ dingTalkWebhookUrl: inputEvent.target.value })}
-              placeholder="https://oapi.dingtalk.com/robot/send?access_token=***"
-            />
-          </label>
-          <label>
-            飞书机器人
-            <input
-              type="checkbox"
-              checked={pushSettings.feishuEnabled}
-              onChange={(inputEvent) => updatePushSettings({ feishuEnabled: inputEvent.target.checked })}
-            />
-          </label>
-          <label>
-            飞书 Webhook
-            <input
-              value={pushSettings.feishuWebhookUrl}
-              onChange={(inputEvent) => updatePushSettings({ feishuWebhookUrl: inputEvent.target.value })}
-              placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/***"
-            />
-          </label>
-        </div>
-
-        <label className="report-editor">
-          报告文本（可手动编辑）
-          <textarea value={reportText} onChange={(inputEvent) => setReportText(inputEvent.target.value)} />
-        </label>
-        <div className="control-buttons">
-          <button type="button" disabled={reportStatus.pushing} onClick={() => void pushReportNow()}>
-            {reportStatus.pushing ? '推送中...' : '推送报告'}
-          </button>
-        </div>
-        <div className="report-history-panel">
-          <h3>报告历史（最近 24 条）</h3>
-          <ul className="report-history-list">
-            {reportHistory.map((item) => (
-              <li key={item.reportId}>
-                <button
-                  type="button"
-                  className={item.reportId === activeReportId ? 'chip primary' : 'chip'}
-                  onClick={() => openReportHistory(item.reportId)}
-                >
-                  {item.periodType}:{item.periodKey} · {item.source}
-                </button>
-                <span>{item.preview}</span>
-              </li>
-            ))}
-            {reportHistory.length === 0 && <li className="empty">暂无历史报告。</li>}
-          </ul>
-        </div>
-        <p className="sync-status">
-          状态: {reportStatus.message}
-          {reportStatus.lastGeneratedAt ? ` · 最近生成 ${formatClock(reportStatus.lastGeneratedAt)}` : ''}
-          {reportStatus.lastPushedAt ? ` · 最近推送 ${formatClock(reportStatus.lastPushedAt)}` : ''}
-        </p>
-      </section>
-
-      <section className="panel">
-        <h2>手工补录</h2>
-        <div className="manual-form">
-          <label>
-            活动标题
-            <input value={manualTitle} onChange={(inputEvent) => setManualTitle(inputEvent.target.value)} />
-          </label>
-          <label>
-            时长（分钟）
-            <input
-              type="number"
-              min={1}
-              value={manualMinutes}
-              onChange={(inputEvent) => setManualMinutes(Math.max(1, Number(inputEvent.target.value)))}
-            />
-          </label>
-          <button type="button" onClick={() => addManual(manualTitle, manualMinutes)}>
-            添加补录
-          </button>
-        </div>
-      </section>
-
-      <section className="panel">
-        <h2>分类汇总（主分类）</h2>
-        <p className="lead">分类图基于同一份 day summary 计算，确保与顶部统计卡口径一致。</p>
-        <CategoryDistributionChart categories={categorySummaries} />
       </section>
 
       <section className="panel">
@@ -679,6 +545,273 @@ export function App() {
           ))}
           {events.length === 0 && <p className="empty">该日期暂无活动记录。</p>}
         </div>
+      </section>
+
+      <section className="panel">
+        <h2>分类汇总（主分类）</h2>
+        <p className="lead">分类图基于同一份 day summary 计算，确保与顶部统计卡口径一致。</p>
+        <CategoryDistributionChart categories={categorySummaries} />
+      </section>
+
+      <section className="panel panel-secondary">
+        <h2>高级设置</h2>
+        <p className="lead">这部分配置默认折叠，避免干扰每日操作流程。</p>
+
+        <details className="advanced-details">
+          <summary className="advanced-summary">
+            <span className="advanced-summary-text">
+              <strong>R2 同步设置</strong>
+              <span>可选 · 对象存储同步</span>
+            </span>
+            <span className={`status-dot tone-${syncTone}`}>{syncDetailLabel}</span>
+          </summary>
+
+          <div className="advanced-content">
+            <div className="sync-grid">
+              <label>
+                启用同步
+                <input
+                  type="checkbox"
+                  checked={syncSettings.enabled}
+                  onChange={(inputEvent) => updateSyncSettings({ enabled: inputEvent.target.checked })}
+                />
+              </label>
+              <label>
+                Account ID
+                <input
+                  value={syncSettings.accountId}
+                  onChange={(inputEvent) => updateSyncSettings({ accountId: inputEvent.target.value.trim() })}
+                  placeholder="cloudflare account id"
+                />
+              </label>
+              <label>
+                Bucket
+                <input
+                  value={syncSettings.bucket}
+                  onChange={(inputEvent) => updateSyncSettings({ bucket: inputEvent.target.value.trim() })}
+                  placeholder="timetracker-sync"
+                />
+              </label>
+              <label>
+                Access Key ID
+                <input
+                  value={syncSettings.accessKeyId}
+                  onChange={(inputEvent) => updateSyncSettings({ accessKeyId: inputEvent.target.value.trim() })}
+                  placeholder="R2 access key id"
+                />
+              </label>
+              <label>
+                Secret Access Key
+                <input
+                  type="password"
+                  value={syncSettings.secretAccessKey}
+                  onChange={(inputEvent) =>
+                    updateSyncSettings({
+                      secretAccessKey: inputEvent.target.value.trim(),
+                    })
+                  }
+                  placeholder="R2 secret access key"
+                />
+              </label>
+              <label>
+                Region
+                <input
+                  value={syncSettings.region}
+                  onChange={(inputEvent) => updateSyncSettings({ region: inputEvent.target.value.trim() || 'auto' })}
+                  placeholder="auto"
+                />
+              </label>
+              <label>
+                端到端加密口令（可选）
+                <input
+                  type="password"
+                  value={syncSettings.encryptionPassphrase}
+                  onChange={(inputEvent) =>
+                    updateSyncSettings({
+                      encryptionPassphrase: inputEvent.target.value,
+                    })
+                  }
+                  placeholder="同步对象加密口令"
+                />
+              </label>
+              <label>
+                同步周期（分钟）
+                <select
+                  value={syncSettings.syncIntervalMinutes}
+                  onChange={(inputEvent) =>
+                    updateSyncSettings({
+                      syncIntervalMinutes: Number(inputEvent.target.value) as 1 | 5 | 15 | 30 | 60,
+                    })
+                  }
+                >
+                  <option value={1}>1</option>
+                  <option value={5}>5</option>
+                  <option value={15}>15</option>
+                  <option value={30}>30</option>
+                  <option value={60}>60</option>
+                </select>
+              </label>
+              <button type="button" disabled={syncStatus.syncing} onClick={() => void runSyncNow()}>
+                {syncStatus.syncing ? '同步中...' : '立即同步'}
+              </button>
+            </div>
+
+            <p className={`status-banner tone-${syncTone}`}>
+              状态: {syncStatus.message}
+              {syncStatus.lastSyncAt ? ` · 最近同步 ${formatClock(syncStatus.lastSyncAt)}` : ''}
+            </p>
+          </div>
+        </details>
+
+        <details className="advanced-details">
+          <summary className="advanced-summary">
+            <span className="advanced-summary-text">
+              <strong>AI 报告与推送</strong>
+              <span>可选 · 生成日报并发送到外部渠道</span>
+            </span>
+            <span className={`status-dot tone-${reportTone}`}>{reportDetailLabel}</span>
+          </summary>
+
+          <div className="advanced-content">
+            <div className="sync-grid">
+              <label>
+                启用 AI 报告
+                <input
+                  type="checkbox"
+                  checked={reportSettings.enabled}
+                  onChange={(inputEvent) => updateReportSettings({ enabled: inputEvent.target.checked })}
+                />
+              </label>
+              <label>
+                API Endpoint
+                <input
+                  value={reportSettings.endpoint}
+                  onChange={(inputEvent) => updateReportSettings({ endpoint: inputEvent.target.value })}
+                  placeholder="https://api.openai.com/v1/responses"
+                />
+              </label>
+              <label>
+                Model
+                <input
+                  value={reportSettings.model}
+                  onChange={(inputEvent) => updateReportSettings({ model: inputEvent.target.value })}
+                  placeholder="gpt-4.1-mini"
+                />
+              </label>
+              <label>
+                API Key
+                <input
+                  type="password"
+                  value={reportSettings.apiKey}
+                  onChange={(inputEvent) => updateReportSettings({ apiKey: inputEvent.target.value })}
+                  placeholder="sk-***"
+                />
+              </label>
+              <label>
+                请求超时(ms)
+                <input
+                  type="number"
+                  min={1000}
+                  value={reportSettings.timeoutMs}
+                  onChange={(inputEvent) =>
+                    updateReportSettings({
+                      timeoutMs: Math.max(1000, Number(inputEvent.target.value) || 15000),
+                    })
+                  }
+                />
+              </label>
+              <div className="control-buttons">
+                <button type="button" disabled={reportStatus.generating} onClick={() => void generateReportNow()}>
+                  {reportStatus.generating ? '生成中...' : '生成报告'}
+                </button>
+              </div>
+            </div>
+
+            <div className="sync-grid">
+              <label>
+                Webhook
+                <input
+                  type="checkbox"
+                  checked={pushSettings.webhookEnabled}
+                  onChange={(inputEvent) => updatePushSettings({ webhookEnabled: inputEvent.target.checked })}
+                />
+              </label>
+              <label>
+                Webhook URL
+                <input
+                  value={pushSettings.webhookUrl}
+                  onChange={(inputEvent) => updatePushSettings({ webhookUrl: inputEvent.target.value })}
+                  placeholder="https://example.com/webhook"
+                />
+              </label>
+              <label>
+                钉钉机器人
+                <input
+                  type="checkbox"
+                  checked={pushSettings.dingTalkEnabled}
+                  onChange={(inputEvent) => updatePushSettings({ dingTalkEnabled: inputEvent.target.checked })}
+                />
+              </label>
+              <label>
+                钉钉 Webhook
+                <input
+                  value={pushSettings.dingTalkWebhookUrl}
+                  onChange={(inputEvent) => updatePushSettings({ dingTalkWebhookUrl: inputEvent.target.value })}
+                  placeholder="https://oapi.dingtalk.com/robot/send?access_token=***"
+                />
+              </label>
+              <label>
+                飞书机器人
+                <input
+                  type="checkbox"
+                  checked={pushSettings.feishuEnabled}
+                  onChange={(inputEvent) => updatePushSettings({ feishuEnabled: inputEvent.target.checked })}
+                />
+              </label>
+              <label>
+                飞书 Webhook
+                <input
+                  value={pushSettings.feishuWebhookUrl}
+                  onChange={(inputEvent) => updatePushSettings({ feishuWebhookUrl: inputEvent.target.value })}
+                  placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/***"
+                />
+              </label>
+            </div>
+
+            <label className="report-editor">
+              报告文本（可手动编辑）
+              <textarea value={reportText} onChange={(inputEvent) => setReportText(inputEvent.target.value)} />
+            </label>
+            <div className="control-buttons">
+              <button type="button" disabled={reportStatus.pushing} onClick={() => void pushReportNow()}>
+                {reportStatus.pushing ? '推送中...' : '推送报告'}
+              </button>
+            </div>
+            <div className="report-history-panel">
+              <h3>报告历史（最近 24 条）</h3>
+              <ul className="report-history-list">
+                {reportHistory.map((item) => (
+                  <li key={item.reportId}>
+                    <button
+                      type="button"
+                      className={item.reportId === activeReportId ? 'chip primary' : 'chip'}
+                      onClick={() => openReportHistory(item.reportId)}
+                    >
+                      {item.periodType}:{item.periodKey} · {item.source}
+                    </button>
+                    <span>{item.preview}</span>
+                  </li>
+                ))}
+                {reportHistory.length === 0 && <li className="empty">暂无历史报告。</li>}
+              </ul>
+            </div>
+            <p className={`status-banner tone-${reportTone}`}>
+              状态: {reportStatus.message}
+              {reportStatus.lastGeneratedAt ? ` · 最近生成 ${formatClock(reportStatus.lastGeneratedAt)}` : ''}
+              {reportStatus.lastPushedAt ? ` · 最近推送 ${formatClock(reportStatus.lastPushedAt)}` : ''}
+            </p>
+          </div>
+        </details>
       </section>
     </main>
   );

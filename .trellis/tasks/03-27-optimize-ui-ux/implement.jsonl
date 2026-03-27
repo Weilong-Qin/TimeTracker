@@ -1,0 +1,6 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Maintain strict typing in component refactor"}
+{"file": ".trellis/spec/frontend/components.md", "reason": "UI semantic structure and interaction rules"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Avoid duplicate state during UI restructure"}
+{"file": ".trellis/spec/frontend/css-design.md", "reason": "Design token and CSS consistency guidance"}
