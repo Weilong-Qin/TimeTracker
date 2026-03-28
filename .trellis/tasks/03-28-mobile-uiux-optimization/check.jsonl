@@ -1,0 +1,11 @@
+{"file": ".agents/skills/finish-work/SKILL.md", "reason": "Finish work checklist"}
+{"file": ".agents/skills/check-frontend/SKILL.md", "reason": "Frontend check spec"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "frontend baseline"}
+{"file": ".trellis/spec/frontend/components.md", "reason": "component interaction rules"}
+{"file": ".trellis/spec/frontend/hooks.md", "reason": "hook ownership patterns"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "single source state guideline"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "strict typing constraints"}
+{"file": ".trellis/spec/frontend/css-design.md", "reason": "css token and composition guidance"}
+{"file": "apps/mobile/src/App.tsx", "reason": "current mobile composition"}
+{"file": "apps/mobile/src/styles.css", "reason": "current visual language"}
+{"file": "apps/mobile/src/hooks/use-mobile-shell.ts", "reason": "mobile model orchestration"}

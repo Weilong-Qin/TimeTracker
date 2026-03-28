@@ -1,0 +1,10 @@
+{"file": ".trellis/workflow.md", "reason": "Project workflow and conventions"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend development guide"}
+{"file": ".trellis/spec/frontend/components.md", "reason": "component interaction rules"}
+{"file": ".trellis/spec/frontend/hooks.md", "reason": "hook ownership patterns"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "single source state guideline"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "strict typing constraints"}
+{"file": ".trellis/spec/frontend/css-design.md", "reason": "css token and composition guidance"}
+{"file": "apps/mobile/src/App.tsx", "reason": "current mobile composition"}
+{"file": "apps/mobile/src/styles.css", "reason": "current visual language"}
+{"file": "apps/mobile/src/hooks/use-mobile-shell.ts", "reason": "mobile model orchestration"}
